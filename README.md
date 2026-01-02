@@ -1,4 +1,19 @@
-import React, { useState, useEffect } from 'react';
+# Computer Built
+
+A small interactive PC builder playground focused on hardware-aware drag-and-drop interactions. The core installation rules live in `src/pcBuilderLogic.js` so they can be exercised by automated tests and reused by UI code. The demo React component below mirrors those rules and logs clear feedback to the user.
+
+## Running checks
+
+```bash
+npm test
+```
+
+The repository uses Node's built-in test runner (no third-party dependencies) to validate installation/removal logic and power-on checks.
+
+## PCBuilder demo component
+
+```jsx
+import React, { useState } from 'react';
 import { Cpu, Zap, CircuitBoard, Fan, HardDrive, Monitor, CheckCircle, AlertCircle, Box, Power } from 'lucide-react';
 
 // --- 组件定义 ---
@@ -61,6 +76,12 @@ export default function PCBuilder() {
     const slot = SLOTS.find(s => s.id === slotId);
 
     if (!item || !slot) return;
+
+    // 0. 阻止覆盖已安装的硬件
+    if (installed[slotId]) {
+      addLog(`错误：${slot.label} 已经安装 ${installed[slotId].name}。`, 'error');
+      return;
+    }
 
     // 1. 检查类型是否匹配
     if (item.type !== slot.accept) {
@@ -247,11 +268,8 @@ export default function PCBuilder() {
                 // 如果是散热器，需要检查CPU是否已安装
                 const isCoolerBlocked = slot.accept === 'COOLER' && draggingItem?.type === 'COOLER' && !installed['socket'];
                 
-                // --- 修复逻辑开始 ---
-                // 如果当前槽位是覆盖层（如散热器槽），并且用户手里正拿着被覆盖层需要的硬件（如CPU）
-                // 那么这个覆盖层应该 "让路" (pointer-events-none)，让用户能点到底下的槽位。
+                // 覆盖层在拖拽 CPU 时需要让出点击，让用户操作底层的 CPU 槽位
                 const isOverlayBlocking = slot.isOverlay && draggingItem?.type === 'CPU';
-                // --- 修复逻辑结束 ---
 
                 // 动态样式
                 let borderColor = 'border-slate-600';
@@ -356,3 +374,4 @@ export default function PCBuilder() {
     </div>
   );
 }
+```

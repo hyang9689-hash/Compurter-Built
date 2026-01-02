@@ -1,0 +1,17 @@
+{
+  "name": "computer-built",
+  "version": "1.0.0",
+  "description": "Interactive PC builder playground with hardware-aware drag-and-drop logic.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "pc-builder",
+    "drag-and-drop",
+    "logic"
+  ],
+  "author": "",
+  "license": "MIT"
+}
